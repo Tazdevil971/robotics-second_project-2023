@@ -1,0 +1,73 @@
+<launch>
+    <param name ="/use_sim_time" value="true"/>
+    <node pkg="rviz" type="rviz" name="$(anon rviz)" args="-d $(find second_project)/config_nav.rviz"/>
+
+    <node pkg="stage_ros" type="stageros" name="stageros" args="$(find second_project)/stage/main.world" >
+        <remap from="base_scan" to="scan"/>
+    </node>
+
+    <node pkg="map_server" type="map_server" name="map_server" args="$(find second_project)/stage/second_2d/second_2d.yaml">
+        <param name="frame_id" value="map"/>
+    </node>
+    
+    <node pkg="second_project" type="navigation" name="navigation" output="screen">
+        <param name="waypoints_csv" value="$(find second_project)/waypoints.csv" />
+    </node>
+
+    <node pkg="amcl" type="amcl" name="amcl" output="screen">
+        <param name="use_map_topic" value="true"/>
+        <param name="odom_model_type" value="diff"/>
+        <param name="odom_alpha5" value="0.1"/>
+        <param name="gui_publish_rate" value="10.0"/>
+        <param name="laser_max_beams" value="3488"/>
+        <param name="laser_max_range" value="12.0"/>
+        <param name="min_particles" value="500"/>
+        <param name="max_particles" value="2000"/>
+        <param name="kld_err" value="0.05"/>
+        <param name="kld_z" value="0.99"/>
+        <param name="odom_alpha1" value="0.7"/>
+        <param name="odom_alpha2" value="0.5"/>
+        <param name="odom_alpha3" value="0.7"/>
+        <param name="odom_alpha4" value="0.5"/>
+        <param name="laser_z_hit" value="0.5"/>
+        <param name="laser_z_short" value="0.05"/>
+        <param name="laser_z_max" value="0.05"/>
+        <param name="laser_z_rand" value="0.5"/>
+        <param name="laser_sigma_hit" value="0.2"/>
+        <param name="laser_lambda_short" value="0.1"/>
+        <param name="laser_model_type" value="likelihood_field"/>
+        <param name="laser_likelihood_max_dist" value="2.0"/>
+        <param name="update_min_d" value="0.25"/>
+        <param name="update_min_a" value="0.1"/>
+        <param name="odom_frame_id" value="odom"/> 
+        <param name="base_frame_id" value="base_link"/> 
+        <param name="global_frame_id" value="map"/>
+        <param name="resample_interval" value="1"/>
+        <param name="transform_tolerance" value="1.0"/>
+        <param name="recovery_alpha_slow" value="0.0"/>
+        <param name="recovery_alpha_fast" value="0.0"/>
+        <param name="initial_pose_x" value="9.4"/>
+        <param name="initial_pose_y" value="6.05"/>
+        <param name="initial_pose_a" value="1.57"/>
+    </node>
+
+    <node pkg="move_base" type="move_base" name="move_base" output="screen">
+        <rosparam file="$(find second_project)/cfg/common_costmap_params.yaml" command="load" ns="global_costmap" /> 
+        <rosparam file="$(find second_project)/cfg/common_costmap_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find second_project)/cfg/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find second_project)/cfg/global_costmap_params.yaml" command="load" /> 
+        <rosparam file="$(find second_project)/cfg/move_base_params.yaml" command="load" />
+        <rosparam file="$(find second_project)/cfg/teb_local_planner_params.yaml" command="load" />
+    
+        <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+        <param name="planner_frequency" value="1.0" />
+        <param name="planner_patience" value="5.0" /> 
+        <param name="use_dijkstra" value="false" />
+
+        <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+        <param name="controller_frequency" value="5.0" />
+        <param name="controller_patience" value="5.0" />
+
+        <param name="clearing_rotation_allowed" value="true"/> 
+    </node>
+</launch>

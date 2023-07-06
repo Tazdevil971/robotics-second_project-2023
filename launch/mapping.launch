@@ -1,0 +1,31 @@
+<launch>
+    <param name="/use_sim_time" value="true" />
+    <node pkg="rviz" type="rviz" name="$(anon rviz)" args="-d $(find second_project)/config_mapping.rviz"/>
+    
+    <node pkg="second_project" type="tf_publisher" name="tf_publisher" />
+    
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan" output="screen">
+        <remap from="cloud_in" to="/velodyne_points" />
+        <remap from="scan" to="/scan2" />
+
+        <param name="min_height" value="0.1" />
+        <param name="max_height" value="0.4" />
+        <param name="angle_min" value="-3.0" />
+        <param name="angle_max" value="3.0" />
+        <param name="angle_increment" value="0.001720548" />
+        <param name="range_min" value="0.0" />
+        <param name="range_max" value="99.0" />
+    </node>
+
+
+    <node pkg="slam_toolbox" type="async_slam_toolbox_node" name="slam_toolbox" output="screen">
+        <rosparam command="load" file="$(find second_project)/cfg/slam_toolbox_params.yaml" />
+        <remap from="scan" to="/scan2" />
+    </node>
+
+    <!-- To save map: -->
+    <!-- rosrun map_server map_saver -f <map> -->    
+    
+    <!-- For some reason this is required, as the first static tf in the bag is lost -->
+    <node pkg="tf" type="static_transform_publisher" name="velodyne_publisher" args="0.18 0 0.17 0 -0.043 0 0.999 base_link velodyne 100" />
+</launch>

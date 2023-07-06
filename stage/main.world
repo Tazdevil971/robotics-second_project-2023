@@ -1,0 +1,23 @@
+include "map.inc"
+include "robot.inc"
+
+resolution 0.02
+interval_sim 100
+
+window
+(
+  size [ 600.0 700.0 ]
+  center [ 0.5 -9.0 ]
+  rotate [ 0.0 0.0 ]
+  scale 10
+)
+
+floorplan(
+    bitmap "second_2d/second_2d.png"
+    size [17.9 31.5 1.5]
+)
+
+robot(
+    pose [0.5 -9.0 0.0 90.0]
+    name "mario"
+)
